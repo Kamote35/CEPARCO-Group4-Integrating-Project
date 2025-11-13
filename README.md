@@ -3,6 +3,7 @@
 ### TASK: implement a simulator for a simplified RISC-V processor, μRISCV. 
  The μRISCV processor offers the following subset of RISC-V instructions: 
 - Group 4: LW, SW, SUB ADD, ADDI, BEQ, BNE
+- Minimum directive: .word
 
 ### The μRISCV processor is based on the RV32I architecture.
 ### The objective this project is to “execute” the program using pipelining with the following schemes to solve the hazards:
