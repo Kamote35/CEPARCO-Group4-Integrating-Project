@@ -51,10 +51,10 @@
                 </div>
                 <div>
                     <span class="text-sm font-medium text-cyan-400 block">Control Hazard</span>
-                    <span class="text-gray-200">Pipeline #2 (for Groups 3/4)</span>
+                    <span class="text-gray-200">Pipeline #2 (probably Predict-Taken)</span>
                 </div>
             </div>
-            <p class="text-xs text-gray-500 mt-4 italic">Note: This tool only implements Milestone 1 (Assembly). The pipeline simulation logic is the next step.</p>
+            <p class="text-xs text-gray-500 mt-4 italic">Note: This tool only implements Milestone 1.</p>
         </div>
 
         <!-- Main Content: Assembler -->
@@ -147,19 +147,14 @@ Example program:
 
         // Instruction definitions: [type, opcode, funct3, funct7]
         const INSTR_MAP = {
-            // R-Type: ADD, SUB, SLL, SLT, AND, OR
+            // R-Type: ADD, SUB
             'add':  ['R', '0110011', '000', '0000000'],
             'sub':  ['R', '0110011', '000', '0100000'],
-            // 'sll':  ['R', '0110011', '001', '0000000'],
-            // 'slt':  ['R', '0110011', '010', '0000000'],
-            // 'and':  ['R', '0110011', '111', '0000000'],
-            // 'or':   ['R', '0110011', '110', '0000000'],
+     
 
-            // I-Type (ALU): ADDI, SLLI, SLTI, ORI
+            // I-Type (ALU): ADDI
             'addi': ['I', '0010011', '000'],
-            // 'slli': ['I', '0010011', '001', '0000000'], // Special case: funct7 is '0000000'
-            // 'slti': ['I', '0010011', '010'],
-            // 'ori':  ['I', '0010011', '110'],
+         
 
             // I-Type (Load): LW
             'lw':   ['L', '0000011', '010'], // L-type is just I-type with different operand parsing
@@ -167,11 +162,9 @@ Example program:
             // S-Type (Store): SW
             'sw':   ['S', '0100011', '010'],
 
-            // B-Type (Branch): BEQ, BNE, BLT, BGE
+            // B-Type (Branch): BEQ, BNE
             'beq':  ['B', '1100011', '000'],
             'bne':  ['B', '1100011', '001'],
-            // 'blt':  ['B', '1100011', '100'],
-            // 'bge':  ['B', '1100011', '101'],
         };
 
         // --- DOM Elements ---
