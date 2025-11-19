@@ -33,3 +33,7 @@ The second pass uses the addresses resolved in Pass 1 to translate each instruct
 **Conclusion**
 
 Milestone 1 has been successfully completed, providing a reliable opcode generator that validates input syntax and adherence to RISC-V immediate constraints. The generated hexadecimal opcodes are ready to serve as the input for the simulation phase.
+
+# Integrating project milestone #2 (Nov 20, 2025)
+
+## GUI (registers, memory), initial execution draft
