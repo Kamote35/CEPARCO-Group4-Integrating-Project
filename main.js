@@ -1,4 +1,5 @@
 import { assembleCode } from './assembler.js';
+import * as Memory from './memory.js';
 
 const assembleButton = document.getElementById('assembleButton');
 const assemblyInput = document.getElementById('assemblyInput');
@@ -29,6 +30,13 @@ assembleButton.addEventListener('click', () => {
         opcodeOutput.textContent = result.data;
         errorOutput.textContent = 'No errors.';
         errorOutput.className = 'whitespace-pre-wrap text-green-400';
+        try {
+            Memory.resetMemory(); // Clear old stuff
+            Memory.loadProgramToMemory(result.data);
+            console.log("Program loaded into memory successfully.");
+        } catch (e) {
+            errorOutput.textContent = `Memory Error: ${e.message}`;
+        }
     } else {
         errorOutput.textContent = `Error on line ${result.line + 1}: ${result.error}`;
         errorOutput.className = 'whitespace-pre-wrap text-red-400';

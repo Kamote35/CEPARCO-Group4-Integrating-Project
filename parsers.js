@@ -5,7 +5,7 @@ import { toBinary, formatHex } from './utils.js';
 
 export function parseRType(parts, def) {
 //parse r type instruction
-    const [_, opcode , funct3, funct7] = def;
+    const [_, opcode, funct3, funct7] = def;
     //extract the components of the instruction from def
     
     const rd = REG_MAP[parts[1]];
@@ -150,4 +150,3 @@ export function parseBType(parts, def, labelMap, currentAddr) {
     return `${imm_12}${imm_10_5}${rs2}${rs1}${funct3}${imm_4_1}${imm_11}${opcode}`;
     //format: [imm 12][imm 10-5][rs2][rs1][funct3][imm 4-1][imm 11][opcode]
 }
-
