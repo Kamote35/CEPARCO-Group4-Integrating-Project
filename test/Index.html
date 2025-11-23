@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>µRISCV Processor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">µRISCV Processor</h1>
+            <p class="text-lg text-gray-400">Simplified RISC-V Simulator</p>
+        </header>
+
+        <div class="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
+            <h2 class="text-xl font-semibold mb-3 text-gray-100">Group 4:</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><span class="text-sm font-medium text-cyan-400 block">Structural Hazard</span><span class="text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;Separate Memory</span></div>
+                <div><span class="text-sm font-medium text-cyan-400 block">Data Hazard</span><span class="text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;No Forwarding</span></div>
+                <div><span class="text-sm font-medium text-cyan-400 block">Control Hazard</span><span class="text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;Pipeline #2</span></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-100">Assembly Input</h2>
+                <p class="text-sm text-gray-400 mb-4">Supported: LW, SW, SUB, ADD, ADDI, BEQ, BNE, .word</p>
+                <textarea id="assemblyInput" class="w-full h-96 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white resize-y focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Enter code here..."></textarea>
+                <button id="assembleButton" class="w-full mt-4 px-6 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 transition-all duration-200">Assemble to Opcode</button>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-100">Registers & Controls</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-sm text-gray-400 mb-2">Registers (x0 read-only)</h3>
+                        <div id="registersGrid" class="grid grid-cols-2 gap-5 max-h-128 overflow-auto p-2 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm text-gray-400 mb-2">Execution Controls</h3>
+                        <div class="space-y-2">
+                            <div class="flex gap-2">
+                                <button id="stepButton" class="flex-1 px-4 py-2 bg-yellow-500 text-black rounded">Single Step</button>
+                                <button id="runButton" class="flex-1 px-4 py-2 bg-green-600 text-white rounded">Run</button>
+                                <button id="resetButton" class="flex-1 px-4 py-2 bg-red-600 text-white rounded">Reset</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <label class="text-sm text-gray-300">PC:</label>
+                                <pre id="pcDisplay" class="whitespace-pre text-sm text-white">0x0080</pre>
+                            </div>
+                            <div class="flex gap-2 items-center">
+                                <input id="gotoAddr" class="w-32 p-2 bg-gray-900 border border-gray-700 rounded text-sm text-white" placeholder="0x0010" />
+                                <button id="gotoBtn" class="px-3 py-2 bg-cyan-600 text-white rounded">Goto Memory</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+
+                <h2 class="text-2xl font-semibold mb-4 text-gray-100">Output: Opcodes (Hex)</h2>
+                <div class="w-full h-64 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white overflow-auto">
+                    <pre id="opcodeOutput" class="whitespace-pre-wrap"></pre>
+                </div>
+
+
+                <h2 class="text-2xl font-semibold mb-4 mt-6 text-gray-100">Output: Error Messages</h2>
+                <div class="w-full h-32 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-red-400 overflow-auto">
+                    <pre id="errorOutput" class="whitespace-pre-wrap">No errors.</pre>
+                </div>
+                
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-100">Memory Editor (0x0000 - 0x007F)</h2>
+                <div class="w-full h-90 p-2 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white overflow-auto">
+                    <div id="memoryTableWrapper" class="w-full h-full overflow-auto">
+                        <table id="memoryTable" class="w-full table-fixed text-sm">
+                            <!-- memory rows will be rendered here -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
