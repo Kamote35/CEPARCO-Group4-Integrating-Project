@@ -37,3 +37,13 @@ Milestone 1 has been successfully completed, providing a reliable opcode generat
 # Integrating project milestone #2 (Nov 20, 2025)
 
 ## GUI (registers, memory), initial execution draft
+
+# Integrating project milestone #3 (Nov 23, 2025)
+
+## Discussion of your project implementation: 
+
+****Design Methodology **
+
+**Testing Methodology** 
+
+**AHA moments****
