@@ -79,7 +79,7 @@ export function loadWord(addr) {
  */
 export function loadProgramToMemory(hexOutput) {
     // Clear Program Segment (0x80 - 0xFF) first if you want
-    memory.fill(0, 0x80, 0xFF); 
+    memory.fill(0, 0x80, MEM_SIZE); 
 
     const lines = hexOutput.split('\n');
     lines.forEach(line => {
