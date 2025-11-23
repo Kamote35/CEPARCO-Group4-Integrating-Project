@@ -42,7 +42,7 @@ Milestone 1 has been successfully completed, providing a reliable opcode generat
 
 ## Discussion of your project implementation: 
 
-****Design Methodology **
+**Design Methodology**
 
 **Testing Methodology** 
 
