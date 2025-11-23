@@ -19,3 +19,39 @@ body {
 ::-webkit-scrollbar-track {
     background: #1f2937;
 }
+
+/* Memory map table fixes: prevent hex words overlapping headers/labels */
+/* Make the table use fixed layout so column widths are predictable */
+.h-80 > table, /* direct child table in the memory container */
+.memory-table {
+    table-layout: fixed;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure sticky header is above table rows */
+thead th.sticky, thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Give the word (hex) column a fixed width so it won't overlap other columns */
+thead th:nth-child(6), tbody td:nth-child(6) {
+    width: 11rem; /* enough to hold 0xXXXXXXXX comfortably */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 1rem;
+}
+
+/* Slightly constrain byte cells to keep layout tidy */
+tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5) {
+    width: 4.5rem;
+}
+
+/* Ensure inputs inside the table don't overflow their cells */
+table input {
+    box-sizing: border-box;
+    max-width: 100%;
+}
