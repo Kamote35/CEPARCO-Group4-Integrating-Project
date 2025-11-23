@@ -18,6 +18,7 @@ const gotoBtn = document.getElementById('gotoBtn');
 const sim = new Simulator();
 
 let lastHighlightedAddr = null;
+let shouldScrollOnRender = false;
 
 function byteToHex(b) {
     return b.toString(16).padStart(2, '0').toUpperCase();
@@ -67,7 +68,10 @@ function renderMemory() {
             cell.classList.add('text-black');
             // ensure visible
             const row = document.getElementById(`row-${lastHighlightedAddr - (lastHighlightedAddr % 16)}`);
-            if (row) row.scrollIntoView({behavior: 'auto', block: 'center'});
+            if (row && shouldScrollOnRender) {
+                row.scrollIntoView({behavior: 'auto', block: 'center'});
+                shouldScrollOnRender = false;
+            }
         }
     }
 }
@@ -132,18 +136,20 @@ gotoBtn.addEventListener('click', () => {
     const v = gotoAddr.value.trim();
     let addr = v.startsWith('0x') ? parseInt(v.substring(2), 16) : parseInt(v);
     if (isNaN(addr) || addr < 0 || addr > 0x7F) return;
-    renderMemory();
-    const rowBase = addr - (addr % 16);
-    const rowEl = document.getElementById(`row-${rowBase}`);
-    if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // remove previous highlight
+    // remove previous highlight before re-render so it isn't re-applied
     if (lastHighlightedAddr !== null) {
         const prev = memoryTable.querySelector(`input[data-addr="${lastHighlightedAddr}"]`);
         if (prev) {
             prev.classList.remove('bg-yellow-600');
             prev.classList.remove('text-black');
         }
+        lastHighlightedAddr = null;
     }
+
+    // request render to scroll once for this action only
+    shouldScrollOnRender = true;
+    renderMemory();
+
     const cell = memoryTable.querySelector(`input[data-addr="${addr}"]`);
     if (cell) {
         cell.classList.add('bg-yellow-600');
@@ -214,11 +220,11 @@ renderRegisters();
 updatePCDisplay();
 
 resetButton.addEventListener('click', () => {
-    // Soft reset: clear registers and PC, keep memory (so program remains loaded)
-    sim.reset();
+    // Hard reset: clear registers, PC, and memory (clear Memory Editor values)
+    sim.reset(true);
     renderRegisters();
     renderMemory();
     updatePCDisplay();
-    errorOutput.textContent = 'Simulator reset (registers cleared, program memory preserved).';
+    errorOutput.textContent = 'Simulator reset (registers and memory cleared).';
     errorOutput.className = 'whitespace-pre-wrap text-gray-400';
 });
