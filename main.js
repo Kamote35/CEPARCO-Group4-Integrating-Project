@@ -2,6 +2,7 @@ import { assembleCode } from './assembler.js';
 import * as Memory from './memory.js';
 import { formatHex } from './utils.js';
 import * as Registers from './registers.js'; 
+import * as CPU from './cpu.js';
 
 const assembleButton = document.getElementById('assembleButton');
 const assemblyInput = document.getElementById('assemblyInput');
@@ -28,6 +29,51 @@ if (resetRegBtn) {
     });
 }
 
+// CPU / Execution Buttons
+const stepBtn = document.getElementById('stepBtn');
+const runBtn = document.getElementById('runBtn');
+const resetCpuBtn = document.getElementById('resetCpuBtn');
+
+if (stepBtn) {
+    stepBtn.addEventListener('click', () => {
+        try {
+            CPU.step();
+            updateRegisterDisplay();
+            updateMemoryDisplay();
+        } catch (e) {
+            errorOutput.textContent = `CPU Error: ${e.message}`;
+            errorOutput.className = 'whitespace-pre-wrap text-red-400';
+        }
+    });
+}
+
+if (runBtn) {
+    runBtn.addEventListener('click', () => {
+        try {
+            runBtn.disabled = true;
+            stepBtn.disabled = true;
+            const cycles = CPU.run(1000);
+            updateRegisterDisplay();
+            updateMemoryDisplay();
+        } catch (e) {
+            errorOutput.textContent = `CPU Run Error: ${e.message}`;
+            errorOutput.className = 'whitespace-pre-wrap text-red-400';
+        } finally {
+            runBtn.disabled = false;
+            stepBtn.disabled = false;
+        }
+    });
+}
+
+if (resetCpuBtn) {
+    resetCpuBtn.addEventListener('click', () => {
+        CPU.reset();
+        Registers.resetRegisters();
+        updateRegisterDisplay();
+        updateMemoryDisplay();
+    });
+}
+
 assembleButton.addEventListener('click', () => {
     const code = assemblyInput.value;
     
@@ -45,6 +91,8 @@ assembleButton.addEventListener('click', () => {
         try {
            // Only load the new program code. Data segment (0x00-0x7F) remains untouched.
             Memory.loadProgramToMemory(result.data);
+            // Reset CPU PC to program start so user can run/step immediately
+            CPU.reset();
             
             // 2. Update the GUI
             updateRegisterDisplay();

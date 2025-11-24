@@ -79,7 +79,12 @@
         <div class="mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-100">Registers</h2>
-                <button id="resetRegBtn" class="bg-cyan-600 text-white px-4 py-1 rounded text-sm hover:bg-cyan-700">Reset Registers</button>
+                <div class="flex space-x-2">
+                    <button id="resetRegBtn" class="bg-cyan-600 text-white px-4 py-1 rounded text-sm hover:bg-cyan-700">Reset Registers</button>
+                    <button id="stepBtn" class="bg-gray-700 text-white px-4 py-1 rounded text-sm hover:bg-gray-600">Step</button>
+                    <button id="runBtn" class="bg-green-600 text-white px-4 py-1 rounded text-sm hover:bg-green-700">Run</button>
+                    <button id="resetCpuBtn" class="bg-red-600 text-white px-4 py-1 rounded text-sm hover:bg-red-700">Reset CPU</button>
+                </div>
             </div>
 
             <div id="registerContainer" class="grid grid-cols-1 gap-2"></div>
