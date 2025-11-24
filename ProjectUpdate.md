@@ -63,8 +63,72 @@ The Assembler from Milestone 1 was integrated directly into the memory module. U
 
 ## Discussion of your project implementation: 
 
-**Design Methodology**
+### Design Methodology
 
-**Testing Methodology** 
+The system is architected as a set of modular JavaScript files, each simulating a specific physical component of the processor.
 
-**AHA moments****
+#### ⭐ Core Simulation Logic
+
+**cpu.js**
+
+The "brain" of the simulator. It manages the execution of the 5-stage pipeline (IF, ID, EX, MEM, WB), holds the state of the pipeline registers (Latches), and implements the hazard detection logic (stalling).
+
+**memory.js**
+
+Simulates the computer's RAM. It creates a 256-byte storage array (Uint8Array) and provides functions to read/write data in 32-bit words (Little Endian format), distinguishing between the Data Segment ($00-7F) and Program Segment ($80-FF).
+
+**registers.js**
+
+Manages the 32 general-purpose registers (x0–x31). It stores their values in an array and enforces the hardware rule that register x0 is always zero (read-only).
+
+#### ⭐ Assembler System
+
+**assembler.js**
+
+The main entry point for translating code. It runs a "Two-Pass" process: Pass 1 maps labels (like LOOP:) to addresses, and Pass 2 generates the final machine code.
+
+**parsers.js**
+
+A helper module containing the specific rules for each instruction type (R, I, S, B, L). It handles the bit-shifting and string manipulation required to format valid 32-bit binary instructions.
+
+#### ⭐ Application & UI
+
+**main.js**
+
+The "controller" that connects your HTML interface to the JavaScript logic. It handles button clicks (Assemble, Step, Run), updates the visual tables (Memory Map, Register List), and records the history needed to draw the Pipeline Map.
+
+**style.css**
+
+Defines the visual look of the simulator, specifically handling the layout of the memory table and ensuring the "sticky" headers work correctly in the Pipeline Map.
+
+#### ⭐ Utilities & Config
+
+**constants.js**
+
+A configuration file acting as the "Instruction Set Manual." It stores the mappings for register names (e.g., sp = x2) and the opcode definitions for supported instructions.
+
+**utils.js**
+
+A toolbox for math conversions. It handles converting numbers between Decimal, Binary (including Two's Complement for negative numbers), and Hexadecimal formats.
+
+### Testing Methodology 
+
+For our testing methodology, we implemented quite a few setups to verify the validity of the outputs we're getting in every assembly.
+
+#### ⭐ Manual Testing
+
+1. We create a mini set of instructions and verify the outputs ourselves. We check when the results we got through manual tracing reflect the output on our web page. 
+2. We also verify the opcodes of each instruction through the RV32I Instruction Set Table.
+
+#### ⭐ Bench Marking
+
+1. We're trying to catch all the possible errors that must be caught by the system. (eg. Entering an invalid instruction, Checking Typos, and constantly checking the outputs).
+2. Inputting instructions outside our specifications to look for possible bugs that are not fixed.
+
+#### ⭐ Event Checker
+
+1. We also test all the events we implemented in our system to ensure they are all working as expected. Like, for instance, the "GO TO" function in our memory map, the reset registers button, the step, run, and others.
+
+### AHA moments
+
+
