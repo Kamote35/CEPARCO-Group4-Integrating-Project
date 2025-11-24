@@ -38,7 +38,6 @@ export function step() {
     const id_rs2 = getRs2(id_inst);
     
     // Determine if the instruction in ID actually uses rs1 or rs2
-    // (Optimization: LUI/AUIPC/JAL don't use rs1/rs2 like R-type, but for this subset we assume standard usage)
     // For simplicity in this subset, most instructions use rs1. 
     // Opcode check can refine this, but checking all is safe for "No Forwarding".
 
@@ -99,7 +98,7 @@ export function step() {
     return { PC }; 
 }
 
-function signExtend(value, bits) {
+function signExtend(value, bits) { // for two's complement
     const shift = 32 - bits;
     return (value << shift) >> shift;
 }
@@ -140,7 +139,6 @@ function stageIF() {
     // Instruction Memory restricted to 0x80 - 0xFF
     if (PC < 0x80 || PC > 0xFF) {
         // In real HW this might throw a fault, here we just fetch 0 (NOP) 
-        // or stop. We'll fetch 0 to be safe.
         next_IF_ID.IR = 0;
         next_IF_ID.NPC = PC; // Trap PC
         next_IF_ID.PC = PC;
@@ -207,6 +205,7 @@ function stageEX() {
     const imm = ID_EX.IMM;
     const rd = ID_EX.RD;
     
+    // stall
     if (inst === 0) { // Bubble / NOP
         next_EX_MEM = { ALUOutput: 0, Cond: 0, IR: 0, B: 0, RD: 0 };
         return;
@@ -265,7 +264,7 @@ function stageMEM() {
 
     if (opcode === 0x03) { // LW
         // Structural Hazard: Data Memory Check (0x00 - 0x7F)
-        if (addr >= 0x00 && addr <= 0x7F) {
+        if (addr >= 0x00 && addr <= 0x7F) { // check bounds
             lmd = Memory.loadWord(addr);
         } else {
             // Access violation or Program Memory access -> Return 0 or handle error
@@ -274,7 +273,7 @@ function stageMEM() {
     } 
     else if (opcode === 0x23) { // SW
         // Structural Hazard: Data Memory Check
-        if (addr >= 0x00 && addr <= 0x7F) {
+        if (addr >= 0x00 && addr <= 0x7F) { // check bounds
             Memory.storeWord(addr, writeData);
         }
     }
