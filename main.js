@@ -16,6 +16,34 @@ const memoryBody = document.getElementById('memoryBody');
 const gotoInput = document.getElementById('gotoAddr');
 const gotoBtn = document.getElementById('gotoBtn');
 
+// --- Global Variables for Pipeline Map ---
+let cycleCount = 0;
+let pipelineHistory = []; // Stores the snapshot of every cycle
+
+// Configuration: Defines which registers appear in the map rows
+// This matches the Excel reference format
+const MAP_ROWS = [
+    // --- IF Stage ---
+    { label: "IF/ID.IR",  path: (s) => s.IF_ID.IR,  section: "IF" },
+    { label: "PC",        path: (s) => s.IF_ID.PC,  section: "IF" },
+    
+    // --- ID Stage ---
+    { label: "ID/EX.A",   path: (s) => s.ID_EX.A,   section: "ID" },
+    { label: "ID/EX.B",   path: (s) => s.ID_EX.B,   section: "ID" },
+    { label: "ID/EX.IMM", path: (s) => s.ID_EX.IMM, section: "ID" },
+    { label: "ID/EX.IR",  path: (s) => s.ID_EX.IR,  section: "ID" },
+
+    // --- EX Stage ---
+    { label: "EX/MEM.ALU",path: (s) => s.EX_MEM.ALUOutput, section: "EX" },
+    { label: "EX/MEM.IR", path: (s) => s.EX_MEM.IR,        section: "EX" },
+    { label: "EX/MEM.B",  path: (s) => s.EX_MEM.B,         section: "EX" },
+
+    // --- MEM Stage ---
+    { label: "MEM/WB.LMD",path: (s) => s.MEM_WB.LMD,       section: "MEM" },
+    { label: "MEM/WB.IR", path: (s) => s.MEM_WB.IR,        section: "MEM" },
+    { label: "MEM/WB.ALU",path: (s) => s.MEM_WB.ALUOutput, section: "MEM" }
+];
+
 // Default placeholder
 assemblyInput.value = `    addi x1, x6, 1
     sw x1, 4(x0)      # Store to Data Memory
@@ -38,9 +66,12 @@ if (stepBtn) {
     stepBtn.addEventListener('click', () => {
         try {
             CPU.step();
+            recordCycleState();
+
             updateRegisterDisplay();
             updateMemoryDisplay();
             updatePipelineDisplay();
+            renderPipelineMap();
         } catch (e) {
             errorOutput.textContent = `CPU Error: ${e.message}`;
             errorOutput.className = 'whitespace-pre-wrap text-red-400';
@@ -53,10 +84,20 @@ if (runBtn) {
         try {
             runBtn.disabled = true;
             stepBtn.disabled = true;
-            const cycles = CPU.run(1000);
+            let cycles = 0;
+            const maxCycles = 1000;
+            while(CPU.isRunning() || cycles < maxCycles) {
+                if(CPU.getPC() < 0x80 || CPU.getPC() > 0xFF) break;
+
+                CPU.step();
+                recordCycleState(); // Record every step
+                cycles++;
+            }
+
             updateRegisterDisplay();
             updateMemoryDisplay();
             updatePipelineDisplay();
+            renderPipelineMap();
         } catch (e) {
             errorOutput.textContent = `CPU Run Error: ${e.message}`;
             errorOutput.className = 'whitespace-pre-wrap text-red-400';
@@ -71,6 +112,12 @@ if (resetCpuBtn) {
     resetCpuBtn.addEventListener('click', () => {
         CPU.reset();
         Registers.resetRegisters();
+
+        // Reset Map Data
+        cycleCount = 0;
+        pipelineHistory = [];
+        renderPipelineMap();
+
         updateRegisterDisplay();
         updateMemoryDisplay();
         updatePipelineDisplay()
@@ -122,6 +169,94 @@ gotoBtn.addEventListener('click', () => {
     if(row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 
+/**
+ * Captures the current CPU state and pushes it to history.
+ */
+function recordCycleState() {
+    cycleCount++;
+    
+    // Get current state from CPU
+    const currentState = CPU.getPipelineRegisters();
+    
+    // Create a DEEP COPY so it doesn't change later as the CPU runs
+    const snapshot = JSON.parse(JSON.stringify(currentState));
+    
+    pipelineHistory.push({
+        cycle: cycleCount,
+        state: snapshot
+    });
+}
+
+/**
+ * Renders the Pipeline Map Table based on history.
+ */
+function renderPipelineMap() {
+    const table = document.getElementById('pipelineMapTable');
+    if (!table) return;
+
+    // 1. Clear Table
+    const thead = table.querySelector('thead');
+    const tbody = table.querySelector('tbody');
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+
+    // 2. Build Header Row (Cycles)
+    const headerRow = document.createElement('tr');
+    
+    // Corner Cell
+    const cornerTh = document.createElement('th');
+    cornerTh.className = "p-2 font-bold text-gray-300 min-w-[150px]";
+    cornerTh.textContent = "Register / Stage";
+    headerRow.appendChild(cornerTh);
+
+    // Cycle Headers
+    pipelineHistory.forEach(entry => {
+        const th = document.createElement('th');
+        th.className = "p-2 min-w-[100px] text-center border-l border-gray-700";
+        th.textContent = `Cycle ${entry.cycle}`;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // 3. Build Data Rows
+    MAP_ROWS.forEach((rowConfig, index) => {
+        const tr = document.createElement('tr');
+        
+        // Add visual separation between sections (IF, ID, EX, MEM)
+        if (index > 0 && MAP_ROWS[index-1].section !== rowConfig.section) {
+            tr.className = "border-t-2 border-gray-700"; 
+        } else {
+            tr.className = "border-b border-gray-800 hover:bg-gray-800/50";
+        }
+
+        // Row Label (Sticky Left)
+        const tdLabel = document.createElement('td');
+        tdLabel.className = "p-2 font-mono text-cyan-400 font-bold text-xs";
+        tdLabel.textContent = rowConfig.label;
+        tr.appendChild(tdLabel);
+
+        // Data Cells for each cycle
+        pipelineHistory.forEach(entry => {
+            const td = document.createElement('td');
+            td.className = "p-2 text-center border-l border-gray-800 text-gray-300 font-mono text-xs";
+            
+            // Extract value using the path function
+            const rawVal = rowConfig.path(entry.state);
+            
+            // Format to Hex
+            td.textContent = formatHex((rawVal >>> 0).toString(16));
+            
+            // Highlight Non-Zero Instructions (IR) for readability
+            if (rowConfig.label.includes("IR") && rawVal !== 0) {
+                td.className += " text-yellow-200 bg-yellow-900/20";
+            }
+            
+            tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+    });
+}
 
 // --- The Render Function ---
 

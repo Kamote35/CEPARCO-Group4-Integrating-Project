@@ -55,3 +55,27 @@ table input {
     box-sizing: border-box;
     max-width: 100%;
 }
+/* Pipeline Map Specific Styles */
+
+/* The first column (Labels) should stick to the left */
+#pipelineMapTable td:first-child,
+#pipelineMapTable th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 20; /* Higher than regular cells */
+    background-color: #111827; /* Match gray-900 to hide scrolling content behind it */
+    border-right: 1px solid #374151; /* gray-700 separator */
+}
+
+/* The Header Row should stick to the top */
+#pipelineMapTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #1f2937; /* gray-800 */
+}
+
+/* The top-left corner needs both sticky properties */
+#pipelineMapTable thead th:first-child {
+    z-index: 30; /* Highest priority */
+}
