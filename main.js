@@ -40,6 +40,7 @@ if (stepBtn) {
             CPU.step();
             updateRegisterDisplay();
             updateMemoryDisplay();
+            updatePipelineDisplay();
         } catch (e) {
             errorOutput.textContent = `CPU Error: ${e.message}`;
             errorOutput.className = 'whitespace-pre-wrap text-red-400';
@@ -55,6 +56,7 @@ if (runBtn) {
             const cycles = CPU.run(1000);
             updateRegisterDisplay();
             updateMemoryDisplay();
+            updatePipelineDisplay();
         } catch (e) {
             errorOutput.textContent = `CPU Run Error: ${e.message}`;
             errorOutput.className = 'whitespace-pre-wrap text-red-400';
@@ -71,6 +73,7 @@ if (resetCpuBtn) {
         Registers.resetRegisters();
         updateRegisterDisplay();
         updateMemoryDisplay();
+        updatePipelineDisplay()
     });
 }
 
@@ -97,6 +100,7 @@ assembleButton.addEventListener('click', () => {
             // 2. Update the GUI
             updateRegisterDisplay();
             updateMemoryDisplay();
+            updatePipelineDisplay();
             
         } catch (e) {
             errorOutput.textContent = `Memory Error: ${e.message}`;
@@ -288,4 +292,64 @@ function updateMemoryDisplay() {
 
         memoryBody.appendChild(tr);
     }
+}
+
+function updatePipelineDisplay() {
+    const pipelineContainer = document.getElementById('pipelineContainer');
+    if (!pipelineContainer) return;
+
+    // 1. Fetch the latest state from the CPU
+    // Ensure your cpu.js has the export function getPipelineRegisters() as discussed
+    const pipeRegs = CPU.getPipelineRegisters(); 
+    
+    pipelineContainer.innerHTML = ''; // Clear previous
+
+    // Define the stages and the keys we want to show for each
+    const stages = [
+        { name: "IF / ID", data: pipeRegs.IF_ID },
+        { name: "ID / EX", data: pipeRegs.ID_EX },
+        { name: "EX / MEM", data: pipeRegs.EX_MEM },
+        { name: "MEM / WB", data: pipeRegs.MEM_WB }
+    ];
+
+    stages.forEach(stage => {
+        // Create a Card for the Stage
+        const card = document.createElement('div');
+        card.className = "bg-gray-900 border border-gray-700 rounded p-3";
+        
+        // Header
+        const title = document.createElement('h3');
+        title.className = "text-cyan-400 font-bold border-b border-gray-700 pb-2 mb-2";
+        title.textContent = stage.name;
+        card.appendChild(title);
+
+        // Data List
+        const list = document.createElement('ul');
+        list.className = "space-y-1 text-sm font-mono text-gray-300";
+
+        // Iterate over keys (e.g., IR, NPC, A, B...)
+        for (const [key, value] of Object.entries(stage.data)) {
+            const li = document.createElement('li');
+            li.className = "flex justify-between";
+            
+            const label = document.createElement('span');
+            label.className = "text-gray-500";
+            label.textContent = key + ":";
+
+            const valSpan = document.createElement('span');
+            // Format as Hex (32-bit unsigned)
+            valSpan.textContent = formatHex((value >>> 0).toString(16)); 
+
+            // Highlight IR (Instruction Register) specifically?
+            if (key === "IR") valSpan.className = "text-yellow-200";
+            else valSpan.className = "text-white";
+
+            li.appendChild(label);
+            li.appendChild(valSpan);
+            list.appendChild(li);
+        }
+        
+        card.appendChild(list);
+        pipelineContainer.appendChild(card);
+    });
 }

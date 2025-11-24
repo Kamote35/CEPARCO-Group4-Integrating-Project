@@ -8,12 +8,9 @@ export function parseRType(parts, def) {
     const [_, opcode, funct3, funct7] = def;
     //extract the components of the instruction from def
     
-    const rd = REG_MAP[parts[1]];
-    //rd
-    const rs1 = REG_MAP[parts[2]];
-    //rs1
-    const rs2 = REG_MAP[parts[3]];
-    //rs2
+    const rd = REG_MAP[parts[1].toLowerCase()];
+    const rs1 = REG_MAP[parts[2].toLowerCase()];
+    const rs2 = REG_MAP[parts[3].toLowerCase()];
     
     if (!rd) return `Invalid destination register: ${parts[1]}`;
     if (!rs1) return `Invalid source register 1: ${parts[2]}`;
@@ -28,9 +25,9 @@ export function parseIType(parts, def, instr) {
 //parse i type instruction
     const [_, opcode, funct3] = def;
     //extract opcode and function code
-    const rd = REG_MAP[parts[1]];
+    const rd = REG_MAP[parts[1].toLowerCase()];
     //rd
-    const rs1 = REG_MAP[parts[2]];
+    const rs1 = REG_MAP[parts[2].toLowerCase()];
     //rs1
     const imm = parseInt(parts[3]);
     //parse imm
@@ -53,7 +50,7 @@ export function parseLoadType(parts, def) {
 //parse load type instruction
     const [_, opcode, funct3] = def;
     //extract opcode and function code
-    const rd = REG_MAP[parts[1]];
+    const rd = REG_MAP[parts[1].toLowerCase()];
     //rd
     const memOperand = parts[2].match(/(-?\d+)\((x\d+|[a-z]+)\)/);
     //extract memory operand components: offset and base register
@@ -82,7 +79,7 @@ export function parseLoadType(parts, def) {
 export function parseSType(parts, def) {
 //parse s type instruction
     const [_, opcode, funct3] = def;
-    const rs2 = REG_MAP[parts[1]];
+    const rs2 = REG_MAP[parts[1].toLowerCase()];
     //source reg
     const memOperand = parts[2].match(/(-?\d+)\((x\d+|[a-z]+)\)/);
     //extract memory operand components: offset and base register
@@ -116,9 +113,9 @@ export function parseSType(parts, def) {
 export function parseBType(parts, def, labelMap, currentAddr) {
 //parse b type instruction
     const [_, opcode, funct3] = def;
-    const rs1 = REG_MAP[parts[1]];
+    const rs1 = REG_MAP[parts[1].toLowerCase()];
     //first comparison
-    const rs2 = REG_MAP[parts[2]];
+    const rs2 = REG_MAP[parts[2].toLowerCase()];
     //second comparison
     const label = parts[3];
     //branch target
