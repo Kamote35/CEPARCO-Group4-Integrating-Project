@@ -39,10 +39,13 @@ export function step() {
         case 0x33: // R-type (add, sub)
             if (funct3 === 0x0) {
                 if (funct7 === 0x00) { // add
-                    const val = (Registers.getRegister(rs1) + Registers.getRegister(rs2)) | 0;
+                    // (a + b) >>> 0 ensures 32-bit unsigned wrap
+                    const val = (Registers.getRegister(rs1) + Registers.getRegister(rs2)) >>> 0;
                     Registers.setRegister(rd, val);
                 } else if (funct7 === 0x20) { // sub
-                    const val = (Registers.getRegister(rs1) - Registers.getRegister(rs2)) | 0;
+                    // FIX: (a - b) >>> 0 ensures the result is treated as a 32-bit integer
+                    // This handles the Two's Complement wrap-around automatically.
+                    const val = (Registers.getRegister(rs1) - Registers.getRegister(rs2)) >>> 0;
                     Registers.setRegister(rd, val);
                 }
             }

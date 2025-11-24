@@ -122,8 +122,8 @@ gotoBtn.addEventListener('click', () => {
 // --- The Render Function ---
 
 function updateRegisterDisplay() {
-    if (!registerContainer) return; // Nothing to update if container missing
-    registerContainer.innerHTML = ''; // Clear current list
+    if (!registerContainer) return; 
+    registerContainer.innerHTML = ''; 
     const regs = Registers.getRegisters();
 
     regs.forEach((val, index) => {
@@ -145,7 +145,7 @@ function updateRegisterDisplay() {
         input.className = "bg-gray-800 text-white border border-gray-600 rounded px-2 py-1 font-mono text-sm w-full ml-2 focus:outline-none focus:ring-1 focus:ring-cyan-500";
         
         // Display value as Hex (0x...)
-        input.value = formatHex(val.toString(16));
+        input.value = formatHex((val >>> 0).toString(16));
 
         // Special handling for x0 (Read Only)
         if (index === 0) {
@@ -167,7 +167,7 @@ function updateRegisterDisplay() {
                 if (!isNaN(newVal)) {
                     Registers.setRegister(index, newVal);
                     // Re-format to hex for display consistency
-                    input.value = formatHex(Registers.getRegister(index).toString(16));
+                    input.value = formatHex((Registers.getRegister(index) >>> 0).toString(16));
                     
                     // Visual feedback (flash green)
                     input.classList.add('border-green-500');
