@@ -76,6 +76,16 @@ function signExtend(value, bits) {
 
 export function reset() {
     PC = 0x80;
+
+    IF_ID = { IR: 0, NPC: 0, PC: 0 };
+    ID_EX = { A: 0, B: 0, IMM: 0, IR: 0, NPC: 0 };
+    EX_MEM = { ALUOutput: 0, Cond: 0, IR: 0, B: 0 };
+    MEM_WB = { LMD: 0, IR: 0, ALUOutput: 0 };
+
+    next_IF_ID = { ...IF_ID };
+    next_ID_EX = { ...ID_EX };
+    next_EX_MEM = { ...EX_MEM };
+    next_MEM_WB = { ...MEM_WB };
 }
 
 export function getPC() {

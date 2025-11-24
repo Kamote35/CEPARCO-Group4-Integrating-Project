@@ -9,93 +9,100 @@
 </head>
 <body class="bg-gray-900 text-gray-200 min-h-screen p-4 md:p-8">
 
-    <div class="max-w-7xl mx-auto">
-        <header class="mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">µRISCV Processor</h1>
-            <p class="text-lg text-gray-400">Simplified RISC-V Simulator</p>
-        </header>
+    <div class="flex flex-row gap-6 p-4 min-h-screen overflow-x-auto bg-gray-900">
 
-        <div class="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-            <h2 class="text-xl font-semibold mb-3 text-gray-100">Group 4:</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div><span class="text-sm font-medium text-cyan-400 block">Structural Hazard</span><span class="text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;Separate Memory</span></div>
-                <div><span class="text-sm font-medium text-cyan-400 block">Data Hazard</span><span class="text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;No Forwarding</span></div>
-                <div><span class="text-sm font-medium text-cyan-400 block">Control Hazard</span><span class="text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;Pipeline #2</span></div>
-            </div>
-        </div>
+        <div class="flex flex-col gap-6 min-w-[600px]">
+            
+            <header>
+                <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">µRISCV Processor</h1>
+                <p class="text-lg text-gray-400">Simplified RISC-V Simulator</p>
+            </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-100">1. Assembly Input</h2>
-                <p class="text-sm text-gray-400 mb-4">Supported: LW, SW, SUB, ADD, ADDI, BEQ, BNE, .word</p>
-                <textarea id="assemblyInput" class="w-full h-96 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white resize-y focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Enter code here..."></textarea>
-                <button id="assembleButton" class="w-full mt-4 px-6 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 transition-all duration-200">Assemble to Opcode</button>
+            <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <h2 class="text-xl font-semibold mb-3 text-gray-100">Configuration</h2>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><span class="text-cyan-400 block">Structural Hazard</span><span class="text-gray-200">Separate Memory</span></div>
+                    <div><span class="text-cyan-400 block">Data Hazard</span><span class="text-gray-200">No Forwarding</span></div>
+                    <div><span class="text-cyan-400 block">Control Hazard</span><span class="text-gray-200">Pipeline #2</span></div>
+                </div>
             </div>
 
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex-1">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-100">Assembly Input</h2>
+                <textarea id="assemblyInput" class="w-full h-64 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white resize-y focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Enter code here..."></textarea>
+                <button id="assembleButton" class="w-full mt-4 px-6 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 transition-all duration-200">Assemble</button>
+            </div>
+
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-100">2. Output: Opcodes (Hex)</h2>
-                <div class="w-full h-64 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white overflow-auto">
+                <h2 class="text-xl font-semibold mb-2 text-gray-100">Opcodes</h2>
+                <p class="text-sm text-gray-400 mb-4">Output Screen #1</p>
+
+                <div class="w-full h-32 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-white overflow-auto mb-4">
                     <pre id="opcodeOutput" class="whitespace-pre-wrap"></pre>
                 </div>
-
-                <h2 class="text-2xl font-semibold mb-4 mt-6 text-gray-100">3. Output: Error Messages</h2>
-                <div class="w-full h-32 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-red-400 overflow-auto">
+                <h2 class="text-xl font-semibold mb-2 text-gray-100">Errors</h2>
+                <p class="text-sm text-gray-400 mb-4">Output Screen #2</p>
+                <div class="w-full h-24 p-4 bg-gray-900 border border-gray-700 rounded-md font-mono text-sm text-red-400 overflow-auto">
                     <pre id="errorOutput" class="whitespace-pre-wrap">No errors.</pre>
                 </div>
             </div>
+        </div>
 
-            <div class="mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-2xl font-semibold text-gray-100">4. Memory Map</h2>
-                        <p class="text-sm text-gray-400 mt-1">Little Endian Memory System</p>
+        <div class="flex flex-col gap-6 min-w-[500px]">
+            
+            <div class="bg-gray-800 p-4 rounded-lg shadow-lg sticky top-0 z-10">
+                <h2 class="text-xl font-semibold text-gray-100 mb-2">Controls</h2>
+                <div class="flex flex-wrap gap-2">
+                    <button id="stepBtn" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">Step</button>
+                    <button id="runBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Run</button>
+                    <button id="resetCpuBtn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Reset CPU</button>
+                    <button id="resetRegBtn" class="bg-cyan-900 text-cyan-100 px-4 py-2 rounded hover:bg-cyan-800">Reset Regs</button>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-gray-100 mb-4">Registers</h2>
+                <div id="registerContainer" class="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
                     </div>
-                    <div class="flex space-x-2">
-                        <input type="text" id="gotoAddr" placeholder="Addr (e.g. 0x0080)" 
-                            class="bg-gray-900 border border-gray-700 text-white px-3 py-1 rounded text-sm w-32 focus:outline-none focus:ring-1 focus:ring-cyan-500">
-                        <button id="gotoBtn" class="bg-cyan-600 text-white px-4 py-1 rounded text-sm hover:bg-cyan-700">Go</button>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-gray-100">Memory</h2>
+                    <div class="flex space-x-1">
+                        <input type="text" id="gotoAddr" placeholder="Addr" class="bg-gray-900 border border-gray-700 text-white px-2 py-1 rounded text-sm w-20">
+                        <button id="gotoBtn" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm">Go</button>
                     </div>
                 </div>
-
-                <div class="h-80 overflow-y-auto border border-gray-700 rounded-md bg-gray-900">
+                <div class="h-96 overflow-y-auto border border-gray-700 rounded-md bg-gray-900">
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-gray-800 text-gray-400 sticky top-0">
                             <tr>
-                                <th class="p-3 font-mono text-sm border-b border-gray-700">Address</th>
-                                <th class="p-3 font-mono text-sm border-b border-gray-700">Value (+0)</th>
-                                <th class="p-3 font-mono text-sm border-b border-gray-700">Value (+1)</th>
-                                <th class="p-3 font-mono text-sm border-b border-gray-700">Value (+2)</th>
-                                <th class="p-3 font-mono text-sm border-b border-gray-700">Value (+3)</th>
-                                <th class="p-3 font-mono text-sm border-b border-gray-700 text-right">Word (Hex)</th>
+                                <th class="p-2 text-xs">Addr</th>
+                                <th class="p-2 text-xs">+0</th>
+                                <th class="p-2 text-xs">+1</th>
+                                <th class="p-2 text-xs">+2</th>
+                                <th class="p-2 text-xs">+3</th>
+                                <th class="p-2 text-xs text-right">Word</th>
                             </tr>
                         </thead>
-                        <tbody id="memoryBody" class="font-mono text-sm text-gray-300">
-                        </tbody>
+                        <tbody id="memoryBody" class="font-mono text-sm text-gray-300"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div class="mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-semibold text-gray-100">Registers</h2>
-                <div class="flex space-x-2">
-                    <button id="resetRegBtn" class="bg-cyan-600 text-white px-4 py-1 rounded text-sm hover:bg-cyan-700">Reset Registers</button>
-                    <button id="stepBtn" class="bg-gray-700 text-white px-4 py-1 rounded text-sm hover:bg-gray-600">Step</button>
-                    <button id="runBtn" class="bg-green-600 text-white px-4 py-1 rounded text-sm hover:bg-green-700">Run</button>
-                    <button id="resetCpuBtn" class="bg-red-600 text-white px-4 py-1 rounded text-sm hover:bg-red-700">Reset CPU</button>
-                </div>
+        <div class="flex flex-col gap-6 min-w-[450px]">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg h-full">
+                <h2 class="text-2xl font-semibold text-gray-100 mb-4">Pipeline Registers</h2>
+                <p class="text-sm text-gray-400 mb-4">Output Screen #4</p>
+                
+                <div id="pipelineContainer" class="flex flex-col gap-4">
+                    </div>
             </div>
+        </div>
 
-            <div id="registerContainer" class="grid grid-cols-1 gap-2"></div>
-        </div>
-        <div class="mt-6 bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-semibold text-gray-100 mb-4">4. Pipeline Registers (Internal State)</h2>
-            <div id="pipelineContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                </div>
-        </div>
     </div>
-
     <script type="module" src="./main.js"></script>
 </body>
 </html>
