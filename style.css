@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: #9ca3af; 
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+/* Memory map table fixes: prevent hex words overlapping headers/labels */
+/* Make the table use fixed layout so column widths are predictable */
+.h-80 > table, /* direct child table in the memory container */
+.memory-table {
+    table-layout: fixed;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure sticky header is above table rows */
+thead th.sticky, thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Give the word (hex) column a fixed width so it won't overlap other columns */
+thead th:nth-child(6), tbody td:nth-child(6) {
+    width: 11rem; /* enough to hold 0xXXXXXXXX comfortably */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 1rem;
+}
+
+/* Slightly constrain byte cells to keep layout tidy */
+tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5) {
+    width: 4.5rem;
+}
+
+/* Ensure inputs inside the table don't overflow their cells */
+table input {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+/* Pipeline Map Specific Styles */
+
+/* The first column (Labels) should stick to the left */
+#pipelineMapTable td:first-child,
+#pipelineMapTable th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 20; /* Higher than regular cells */
+    background-color: #111827; /* Match gray-900 to hide scrolling content behind it */
+    border-right: 1px solid #374151; /* gray-700 separator */
+}
+
+/* The Header Row should stick to the top */
+#pipelineMapTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #1f2937; /* gray-800 */
+}
+
+/* The top-left corner needs both sticky properties */
+#pipelineMapTable thead th:first-child {
+    z-index: 30; /* Highest priority */
+}
