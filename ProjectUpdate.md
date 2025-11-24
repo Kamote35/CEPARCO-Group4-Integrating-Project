@@ -131,4 +131,6 @@ For our testing methodology, we implemented quite a few setups to verify the val
 
 ### AHA moments
 
+### AI Declaration: Our group had the help of AI in making our GUI so that the outputs would be more pleasant 
+
 
