@@ -1,7 +1,12 @@
 import * as Memory from './memory.js';
 import * as Registers from './registers.js';
 
+// Simple single-cycle CPU for the supported instruction subset
+// PC starts at 0x80 (program segment)
+// cpu.js
+
 // --- PIPELINE REGISTERS (LATCHES) ---
+// These hold the state "between" stages.
 let IF_ID = { IR: 0, NPC: 0, PC: 0 };
 let ID_EX = { A: 0, B: 0, IMM: 0, IR: 0, NPC: 0, RS1: 0, RS2: 0, RD: 0 };
 let EX_MEM = { ALUOutput: 0, Cond: 0, IR: 0, B: 0, RD: 0 };
@@ -18,7 +23,7 @@ let next_ID_EX = { ...ID_EX };
 let next_EX_MEM = { ...EX_MEM };
 let next_MEM_WB = { ...MEM_WB };
 
-// Helper: Extract Register Fields
+// return 11:7, 19:15, 24:20
 function getRd(inst)  { return (inst >> 7) & 0x1F; }
 function getRs1(inst) { return (inst >> 15) & 0x1F; }
 function getRs2(inst) { return (inst >> 20) & 0x1F; }
@@ -29,18 +34,21 @@ export function step() {
 
     // 1. EXECUTE STAGES
     // Order: WB -> MEM -> EX -> ID -> IF
-    // This allows data to flow through latches correctly in one JS cycle step
+    // This allows data to flow through latches correctly
     stageWB();
     stageMEM();
     stageEX();
     
     // 2. HAZARD DETECTION (Data Hazard - No Forwarding)
+    // gets registers and opcodes from ID stage
     const id_inst = IF_ID.IR;
     const id_rs1 = getRs1(id_inst);
     const id_rs2 = getRs2(id_inst);
     const opcode = id_inst & 0x7F;
 
     // Hazards check against EX and MEM stages
+    // looks at the instructions ahead in the pipeline that 
+    // might be producing the data the ID stage needs.
     const ex_rd = next_EX_MEM.RD;
     const ex_has_write = (ex_rd !== 0);
     const mem_rd = next_MEM_WB.RD;
@@ -48,12 +56,12 @@ export function step() {
 
     let stall = false;
 
-    // Check RS1 (Used by almost all, including Branch)
+    // If either EX or MEM destination in rs1 matches, then stall
     if (ex_has_write && ex_rd === id_rs1) stall = true;
     if (mem_has_write && mem_rd === id_rs1) stall = true;
 
-    // Check RS2 (Used by R-Type, Store, and Branch)
     // R-Type (0x33), Store (0x23), Branch (0x63)
+    // If either EX or MEM destination in rs2 matches, then stall
     if ((opcode === 0x33 || opcode === 0x23 || opcode === 0x63)) {
         if (ex_has_write && ex_rd === id_rs2) stall = true;
         if (mem_has_write && mem_rd === id_rs2) stall = true;
@@ -61,10 +69,11 @@ export function step() {
 
     // 3. RUN ID/IF STAGES (If not stalled)
     if (!stall) {
-        stageID(); // PIPELINE #2: Branch Logic is now inside here
+        //if no stall, proceed normally
+        stageID(); // If it is a branch, the PC is updated here due to Pipeline #2
         stageIF(); // Fetches based on the PC set by ID
     } else {
-        // STALL LOGIC: Insert Bubble into ID/EX
+        // STALL LOGIC, like a NOP instruction in ID stage
         next_ID_EX = { 
             A: 0, B: 0, IMM: 0, IR: 0, NPC: 0, RS1: 0, RS2: 0, RD: 0 
         };
@@ -73,13 +82,14 @@ export function step() {
     }
 
     // 4. UPDATE LATCHES
+    // EX_MEM and MEM_WB are updated regardless of the stall
     ID_EX = { ...next_ID_EX };
     EX_MEM = { ...next_EX_MEM };
     MEM_WB = { ...next_MEM_WB };
     
+    //if stalled, IF_ID and PC remain unchanged
     if (!stall) {
         IF_ID = { ...next_IF_ID };
-        // NOTE: PC is updated inside stageIF based on whether ID branched or not
     }
 
     return { PC }; 
@@ -156,7 +166,7 @@ function stageID() {
     let imm = 0;
     
     // --- PIPELINE #2: BRANCH RESOLUTION IN ID ---
-    if (opcode === 0x63) { // Branch (BEQ, BNE)
+    if (opcode === 0x63) { // B-type (BEQ, BNE)
         // 1. Calculate Immediate
         imm = signExtend(
              (((inst >>> 31) & 0x1) << 12) |
@@ -164,17 +174,15 @@ function stageID() {
              (((inst >>> 25) & 0x3f) << 5) |
              (((inst >>> 8) & 0xf) << 1), 13);
         
-        // 2. Check Condition
+        // 2. Check Condition, Zero Equality Test
         let take = false;
         if (funct3 === 0x0) take = (valA === valB); // BEQ
         else if (funct3 === 0x1) take = (valA !== valB); // BNE
 
         if (take) {
-            // 3. Compute Target
-            // Note: IF_ID.PC is the address of the current branch instruction
+            // 3. Compute Target Address
             const target = (IF_ID.PC + imm) >>> 0;
-            
-            // 4. Update Global PC immediately
+            // 4. Update PC
             // This ensures stageIF (which runs next) fetches from 'target'
             // effectively "flushing" the sequential fetch that would have happened.
             PC = target; 
@@ -182,9 +190,9 @@ function stageID() {
         }
     } 
     // Other Immediates
-    else if (opcode === 0x13 || opcode === 0x03) { 
+    else if (opcode === 0x13 || opcode === 0x03) { // I-type (ADDI, LW)
         imm = signExtend(inst >>> 20, 12);
-    } else if (opcode === 0x23) { 
+    } else if (opcode === 0x23) {  // S-type (SW)
         imm = signExtend((((inst >>> 25) << 5) | ((inst >>> 7) & 0x1f)), 12);
     }
 
