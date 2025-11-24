@@ -1,7 +1,8 @@
 // registers.js
 import { formatHex } from './utils.js';
+//for hex formatting
 
-// 32 Registers, initialized to 0
+//32 bit integer array for reg storage, initialized to 0
 const registers = new Int32Array(32);
 
 export const REG_NAMES = [
@@ -10,12 +11,14 @@ export const REG_NAMES = [
     "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
     "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 ];
+//names
 
 /**
  * Resets all registers to 0.
  */
 export function resetRegisters() {
     registers.fill(0);
+    //set all reg to 0
 }
 
 /**
@@ -23,6 +26,7 @@ export function resetRegisters() {
  */
 export function getRegisters() {
     return registers;
+    //return the raw regs
 }
 
 /**
@@ -34,6 +38,7 @@ export function getRegisters() {
 export function setRegister(index, value) {
     if (index === 0) return; // x0 is hardwired to 0
     registers[index] = value;
+    //update reg value
 }
 
 /**
@@ -41,4 +46,5 @@ export function setRegister(index, value) {
  */
 export function getRegister(index) {
     return registers[index];
+    //return current reg value
 }
