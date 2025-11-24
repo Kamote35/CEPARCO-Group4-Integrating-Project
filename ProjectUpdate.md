@@ -131,6 +131,8 @@ For our testing methodology, we implemented quite a few setups to verify the val
 
 ### AHA moments
 
+Load word instruction acts as an immediate type instructino in real RISC-V RV32I base architecture but in our μRISC Simulator we have to implement the load instruction as it's own type since we're not actually using an actual CPU, but rather we are parsing the instructions one-by-one, where the tokens are separated by spaces, commas, and parenthesis. 
+
 ### AI Declaration: Our group had the help of AI in making our GUI so that the outputs would be more pleasant 
 
 
